@@ -1,9 +1,7 @@
-# Copilot DAX Development Notes
-
-## Measure 1: Running Total Sales
-- **Requirement:** Running total (cumulative sales over date).
-- **Prompt:** "Write a DAX measure for cumulative sales running total over date for Fact_Sales and Dim_Date."
+## Measure 2: Month-over-Month (MoM) Sales Growth
+- **Requirement:** Month-over-month sales growth percentage.
+- **Prompt:** "Write a DAX measure for Month-over-Month Sales Growth percentage comparing current month sales to previous month sales."
 - **Copilot Initial Suggestion:**
 
-- **Corrections/Refinements:** Verified column name matches `Fact_Sales[sales_amount]` (or `[sales amount]`) and confirmed filter context transitions across `Dim_Date[date]` rather than aggregating over the fact table directly, maintaining star schema performance.
+- **Corrections/Refinements:** Replaced the raw division operator `/` with the safer `DIVIDE()` function to prevent divide-by-zero errors (`NaN` / infinity) for months without prior baseline data, and aligned the time intelligence calculation to reference `Dim_Date[date]`.
 - **Final DAX Code:**
