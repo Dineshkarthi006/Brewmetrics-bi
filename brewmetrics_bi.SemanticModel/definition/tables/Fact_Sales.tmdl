@@ -1,6 +1,52 @@
 table Fact_Sales
 	lineageTag: f7d41980-2e37-4ec4-a9d3-91e1976282e7
 
+	measure 'Running Total Sales' =
+			
+			CALCULATE(
+			    SUM(Fact_Sales[sales_amount]),
+			    FILTER(
+			        ALL(Dim_Date[date]),
+			        Dim_Date[date] <= MAX(Dim_Date[date])
+			    )
+			)
+		lineageTag: 32f043fb-8596-47a1-95c9-487f174c0111
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Sales MoM Growth' =
+			
+			VAR CurrentMonthSales = SUM(Fact_Sales[sales_amount])
+			VAR PrevMonthSales = CALCULATE(SUM(Fact_Sales[sales_amount]), PREVIOUSMONTH(Dim_Date[date]))
+			RETURN
+			DIVIDE(CurrentMonthSales - PrevMonthSales, PrevMonthSales, 0)
+		lineageTag: 24d15a9e-5ed8-4460-8bbc-61ed9958a3ac
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'City Rank' = ```
+			
+			RANKX(
+			    ALL(Dim_City[city]), 
+			    CALCULATE(SUM(Fact_Sales[sales_amount])), 
+			    , 
+			    DESC, 
+			    Dense
+			)
+			```
+		formatString: 0
+		lineageTag: e74829d5-163c-45e5-a1d6-6b647f7256aa
+
+	measure 'Cold Brew Sales Share' =
+			
+			VAR ColdBrewSales = CALCULATE(SUM(Fact_Sales[sales_amount]), Dim_Product[item] = "Cold Brew")
+			VAR TotalSales = CALCULATE(SUM(Fact_Sales[sales_amount]), ALL(Dim_Product))
+			RETURN
+			DIVIDE(ColdBrewSales, TotalSales, 0)
+		lineageTag: 5bcd99ca-f728-499e-a6f4-ac57ac1a4572
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
 	column sale_id
 		dataType: int64
 		formatString: 0
